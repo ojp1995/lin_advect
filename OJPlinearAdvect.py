@@ -94,7 +94,6 @@ convergence_exp()
         
 
 nx_list = (40, 160, 200, 240)  ##list of values to vary spacial step to vary c
-initial_conditions(x, alpha, beta) = (cosBell(x,alpha, beta), squareWave(x, alpha, beta))
 def c_exp():
     "Experiment to test the Von_Neumann stability analysis by varying the "
     "spacial steps to vary the courant number"
@@ -105,69 +104,68 @@ def c_exp():
     
     ##loop over the differnet sizes of spacial steps
     for i in range(len(nx_list)):
-        for k in range(len(initial_conditions)):
+    
             
             
-            nx = nx_list[i]  ##varying number of spacial steps to vary c
-            nt = 40  ##keeping spacial steps constant so c varys
-            
-            u= 0.2  ##wind speed constant
-            dx = (xmax - xmin)/nx
-            c = u*(nx/nt)
-            print(c)  ##printing the courant number each time to double check how it changes
-            
-            x = np.arange(xmin, xmax, dx)
-            
-            # Initial conditions
-            phiOld = initial_conditions(k(x, 0.25, 0.75))
-            # Exact solution is the initial condition shifted around the domain
-            phiAnalytic = ((x - c*nt*dx)%(xmax - xmin), 0.25, 0.75)
-            
-            # Advect the profile using finite difference for all the time steps
-            phiFTCS = FTCS(phiOld, c, nt)
-            phiFTBS = FTBS(phiOld, c, nt)
-            phiCTCS = CTCS(phiOld, c, nt)
-            phiLW = LW(phiOld, c, nt)
-            
-            ##calculating the l2error norms  
-            l2FTCS, errorFTCS = l2ErrorNorm(phiFTCS, phiAnalytic)
-            l2FTBS, errorFTBS = l2ErrorNorm(phiFTBS, phiAnalytic)
-            l2CTCS, errorCTCS = l2ErrorNorm(phiCTCS[nt-1,:], phiAnalytic)
-            l2LW, errorLW = l2ErrorNorm(phiLW, phiAnalytic)
-            
-            font = {'size'   : 20}
-            plt.rc('font', **font)
-            plt.figure(10*k+i+3, figsize=(10,7))
-            plt.clf()
-            plt.ion()
-            plt.plot(x, phiOld, label='Initial', color='black')
-            plt.plot(x, phiAnalytic, label='Analytic', color='black', 
-                     linestyle='--', linewidth=2)
-            plt.plot(x, phiFTBS, label='FTBS', color='red')
-            plt.plot(x, phiCTCS[nt-1,:], label='CTCS', color='green') #using second to last time step of t to plot
-            plt.plot(x, phiLW, label='Lax-Wendroff', color="orange")  #using second to last time step to plot
-            plt.axhline(0, linestyle=':', color='black')
-            plt.ylim([-0.2,1.4])  #increased y limiy to show where LW seems to be going wrong
-            plt.legend()
-            plt.xlabel('$x$')
-            plt.ylabel('$\phi$')
-            plt.title('Linear Advection where c=%f'%c)
-            
-            ##printing l2 and linf norm so we can see how error changes as we 
-            ##increase resolution 
-            print("FTBS l2 error norm = ", l2FTBS)
-            print("FTBS linf error norm = ", lInfErrorNorm(phiFTBS, phiAnalytic))
-            
-            
-            print("CTCS l2 error norm = ", l2CTCS)
-            print("CSCS linf error norm = ", lInfErrorNorm(phiCTCS, phiAnalytic))
-            
-            
-            print("LW l2 error norm = ", l2LW)
-            print("LW linf error norm = ", lInfErrorNorm(phiLW, phiAnalytic))
-            
-            
-            
+        nx = nx_list[i]  ##varying number of spacial steps to vary c
+        nt = 40  ##keeping spacial steps constant so c varys
+        
+        u= 0.2  ##wind speed constant
+        dx = (xmax - xmin)/nx
+        c = u*(nx/nt)
+        print(c)  ##printing the courant number each time to double check how it changes
+        
+        x = np.arange(xmin, xmax, dx)
+        
+        # Initial conditions
+        phiOld = squareWave(x, 0.25, 0.75)
+        # Exact solution is the initial condition shifted around the domain
+        phiAnalytic = squareWave((x - c*nt*dx)%(xmax - xmin), 0.25, 0.75)
+        
+        # Advect the profile using finite difference for all the time steps
+        phiFTCS = FTCS(phiOld, c, nt)
+        phiFTBS = FTBS(phiOld, c, nt)
+        phiCTCS = CTCS(phiOld, c, nt)
+        phiLW = LW(phiOld, c, nt)
+        
+        ##calculating the l2error norms  
+        l2FTCS, errorFTCS = l2ErrorNorm(phiFTCS, phiAnalytic)
+        l2FTBS, errorFTBS = l2ErrorNorm(phiFTBS, phiAnalytic)
+        l2CTCS, errorCTCS = l2ErrorNorm(phiCTCS[nt-1,:], phiAnalytic)
+        l2LW, errorLW = l2ErrorNorm(phiLW, phiAnalytic)
+        
+        font = {'size'   : 20}
+        plt.rc('font', **font)
+        plt.figure(i+3, figsize=(10,7))
+        plt.clf()
+        plt.ion()
+        plt.plot(x, phiOld, label='Initial', color='black')
+        plt.plot(x, phiAnalytic, label='Analytic', color='black', 
+                 linestyle='--', linewidth=2)
+        plt.plot(x, phiFTBS, label='FTBS', color='red')
+        plt.plot(x, phiCTCS[nt-1,:], label='CTCS', color='green') #using second to last time step of t to plot
+        plt.plot(x, phiLW, label='Lax-Wendroff', color="orange")  #using second to last time step to plot                plt.axhline(0, linestyle=':', color='black')
+        plt.ylim([-0.2,1.4])  #increased y limiy to show where LW seems to be going wrong
+        plt.legend()
+        plt.xlabel('$x$')
+        plt.ylabel('$\phi$')
+        plt.title('Linear Advection where c=%f'%c)
+    
+    ##printing l2 and linf norm so we can see how error changes as we 
+   ##increase resolution 
+        print("FTBS l2 error norm = ", l2FTBS)
+        print("FTBS linf error norm = ", lInfErrorNorm(phiFTBS, phiAnalytic))
+        
+        
+        print("CTCS l2 error norm = ", l2CTCS)
+        print("CSCS linf error norm = ", lInfErrorNorm(phiCTCS, phiAnalytic))
+   
+   
+        print("LW l2 error norm = ", l2LW)
+        print("LW linf error norm = ", lInfErrorNorm(phiLW, phiAnalytic))
+  
+  
+  
 c_exp()
         
 def TV():
