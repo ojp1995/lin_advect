@@ -187,7 +187,7 @@ def TV():
     x = np.arange(xmin, xmax, dx)
     
     ## Initial conditions
-    phiOld = cosBell(x, 0.25, 0.75)
+    phiOld = squareWave(x, 0.25, 0.75)
     
     ##initialising vectors to store Vartiation for each time step
     TV_FTBS = np.zeros(nx-2)
